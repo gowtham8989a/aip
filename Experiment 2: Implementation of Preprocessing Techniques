@@ -1,0 +1,24 @@
+import numpy as np
+from sklearn.preprocessing import Binarizer, StandardScaler, Normalizer
+
+data = np.array([[1, -1, 2],
+                 [2, 0, 0],
+                 [0, 1, -1]])
+
+print("Original Data:\n", data)
+
+binarizer = Binarizer(threshold=0.0)
+binary_data = binarizer.transform(data)
+print("\nBinarized Data:\n", binary_data)
+
+scaler = StandardScaler(with_mean=True, with_std=False)
+mean_removed = scaler.fit_transform(data)
+print("\nData after Mean Removal:\n", mean_removed)
+
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(data)
+print("\nScaled Data (Zero mean, unit variance):\n", scaled_data)
+
+normalizer = Normalizer()
+normalized_data = normalizer.transform(data)
+print("\nNormalized Data (Unit norm):\n", normalized_data)
