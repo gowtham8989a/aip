@@ -1,0 +1,47 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+
+data = {
+    'text': [
+        "I love this movie, it’s amazing!",
+        "This is a terrible product.",
+        "The plot was boring and slow.",
+        "What a fantastic experience!",
+        "Not worth the money.",
+        "Absolutely loved it!",
+        "Worst movie ever.",
+        "Highly recommended!",
+        "Bad acting and poor direction.",
+        "Great story, very touching!",
+        "I really enjoyed this film!",
+        "Awful direction and poor editing.",
+        "A masterpiece, truly beautiful.",
+        "Terrible waste of time.",
+        "I would definitely watch it again.",
+        "I hated every moment of it.",
+        "Brilliant acting and cinematography!",
+        "So bad, I couldn’t finish it.",
+        "Wonderful and inspiring!",
+        "Completely disappointing."
+    ],
+    'label': [1,0,0,1,0,1,0,1,0,1,1,0,1,0,1,0,1,0,1,0]
+}
+
+df = pd.DataFrame(data)
+
+X_train, X_test, y_train, y_test = train_test_split(df['text'], df['label'], test_size=0.3, random_state=42)
+
+vectorizer = TfidfVectorizer(stop_words='english')
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+model = LogisticRegression()
+model.fit(X_train_tfidf, y_train)
+y_pred = model.predict(X_test_tfidf)
+
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\n--- Sentiment Classification Report ---")
+print(classification_report(y_test, y_pred, target_names=["Negative", "Positive"], zero_division=0))
