@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, accuracy_score
+
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"
+columns = [
+    'age', 'workclass', 'fnlwgt', 'education', 'education-num', 'marital-status',
+    'occupation', 'relationship', 'race', 'sex', 'capital-gain', 'capital-loss',
+    'hours-per-week', 'native-country', 'income'
+]
+
+data = pd.read_csv(url, names=columns, na_values=" ?", sep=',', skipinitialspace=True)
+data.dropna(inplace=True)
+data['income'] = data['income'].apply(lambda x: 1 if x.strip() == '>50K' else 0)
+data_encoded = pd.get_dummies(data.drop('income', axis=1))
+
+X_train, X_test, y_train, y_test = train_test_split(
+    data_encoded, data['income'], test_size=0.2, random_state=42
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+svm_model = SVC(kernel='rbf', C=1.0, gamma='scale')
+svm_model.fit(X_train_scaled, y_train)
+
+y_pred = svm_model.predict(X_test_scaled)
+
+print("Accuracy:", round(accuracy_score(y_test, y_pred), 4))
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred, target_names=["<=50K", ">50K"]))
