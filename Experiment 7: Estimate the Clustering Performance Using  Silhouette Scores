@@ -1,0 +1,40 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_blobs
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
+from sklearn.metrics import silhouette_score
+
+X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.60, random_state=42)
+
+models = {
+    'KMeans': KMeans(n_clusters=4, random_state=42),
+    'DBSCAN': DBSCAN(eps=0.3, min_samples=10),
+    'Agglomerative': AgglomerativeClustering(n_clusters=4)
+}
+
+sil_scores = {}
+
+for name, model in models.items():
+    if name == 'DBSCAN':
+        labels = model.fit_predict(X)
+        if len(set(labels)) > 1 and -1 not in set(labels):
+            score = silhouette_score(X, labels)
+        else:
+            score = -1
+    else:
+        labels = model.fit_predict(X)
+        score = silhouette_score(X, labels)
+    sil_scores[name] = score
+
+print("Silhouette Scores:")
+for name, score in sil_scores.items():
+    print(f"{name}: {score:.4f}")
+
+plt.figure(figsize=(7, 4))
+plt.bar(sil_scores.keys(), sil_scores.values(), color='skyblue')
+plt.title('Silhouette Scores of Different Clustering Algorithms')
+plt.xlabel('Clustering Algorithm')
+plt.ylabel('Silhouette Score')
+plt.ylim(0, 1)
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.show()
